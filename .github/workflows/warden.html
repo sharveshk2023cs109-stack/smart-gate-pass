@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warden Dashboard | Smart Gate Pass</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body onload="initWarden()" class="dashboard-layout">
+    <div class="mesh-bg"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-hotel"></i>
+                <span>Warden Portal</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" onclick="switchPortalTab('pending', 'warden')">
+                <i class="fas fa-bed"></i> <span>Hostel Desk</span>
+            </a>
+            <a href="#" class="sidebar-link" onclick="switchPortalTab('history', 'warden')">
+                <i class="fas fa-history"></i> <span>Approval History</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-primary"
+                style="width: 100%; height: auto; padding: 0.75rem; background: var(--secondary)">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="page-title">
+                <h1>Warden Dashboard</h1>
+                <p>Hostel Exit Management & Safety Oversight.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div id="year-filter-info"
+                    style="font-size: 0.875rem; background: var(--primary-glow); color: var(--primary-light); padding: 0.5rem 1rem; border-radius: 0.75rem; border: 1px solid var(--glass-border); font-weight: 700;">
+                    <!-- Filled by script -->
+                </div>
+                <button onclick="toggleTheme()" class="theme-toggle"
+                    style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-main); width: 40px; height: 40px; border-radius: 10px; cursor: pointer;">
+                    <i id="theme-toggle-icon" class="fas fa-sun"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Requests Grid -->
+        <div id="requests-container" class="animate-fade-in"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem;">
+            <!-- Requests will be rendered here via JS -->
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-muted);">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Synchronizing hostel records...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        async function initWarden() {
+            checkAuth('warden');
+            updateThemeToggleUI();
+            await renderRequests('warden');
+
+            const user = getCurrentUser();
+            if (user && user.role === 'warden') {
+                document.getElementById('year-filter-info').innerText = `Year ${user.year} Warden`;
+            }
+        }
+    </script>
+</body>
+
+</html>

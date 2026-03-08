@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Security | Smart Gate Pass</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body onload="initGate()" class="dashboard-layout">
+    <div class="mesh-bg"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-shield-halved"></i>
+                <span>Gate Control</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" onclick="scrollToSection('scanner-section')">
+                <i class="fas fa-qrcode"></i> <span>Pass Scanner</span>
+            </a>
+            <a href="#" class="sidebar-link" onclick="scrollToSection('history-section')">
+                <i class="fas fa-list-ul"></i> <span>Exit Log</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-primary"
+                style="width: 100%; height: auto; padding: 0.75rem; background: var(--secondary)">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="page-title">
+                <h1>Security Operations</h1>
+                <p>Real-time verification and exit recording terminal.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button onclick="toggleTheme()" class="theme-toggle"
+                    style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-main); width: 40px; height: 40px; border-radius: 10px; cursor: pointer;">
+                    <i id="theme-toggle-icon" class="fas fa-sun"></i>
+                </button>
+            </div>
+        </header>
+
+        <section id="scanner-section" class="animate-fade-in">
+            <div class="glass-card" style="padding: 2.5rem; max-width: 600px; margin: 0 auto 3rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div
+                        style="display: inline-flex; width: 64px; height: 64px; background: var(--primary-glow); color: var(--primary); border-radius: 1.25rem; align-items: center; justify-content: center; margin-bottom: 1rem; border: 1px solid var(--glass-border);">
+                        <i class="fas fa-camera" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h2 style="color: var(--text-main); font-weight: 800;">Pass Scanner</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Align the QR code within the frame to
+                        verify.</p>
+                </div>
+
+                <div id="reader-container"
+                    style="overflow: hidden; border-radius: 1.5rem; border: 1.5px solid var(--primary); background: #000; box-shadow: 0 0 0 4px var(--primary-glow);">
+                    <div id="reader"></div>
+                </div>
+
+                <!-- Verification Overlay -->
+                <div id="scan-result" style="margin-top: 2rem; display: none;">
+                    <div class="animate-scale-in"
+                        style="background: rgba(16, 185, 129, 0.1); border: 1.5px solid var(--success); border-radius: 1.5rem; padding: 1.5rem;">
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <div
+                                style="display: inline-flex; width: 44px; height: 44px; background: var(--success); color: white; border-radius: 50%; align-items: center; justify-content: center; margin-bottom: 0.5rem; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h3 style="color: var(--success); font-weight: 800;">VERIFIED ACCESS</h3>
+                        </div>
+                        <div id="student-details-preview" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <!-- Details injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="history-section" class="animate-fade-in">
+            <div class="table-container">
+                <div
+                    style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="color: var(--text-main); font-size: 1.25rem; font-weight: 800; margin: 0;">Outgoing
+                        History</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="downloadGateHistoryCSV()" class="btn-primary"
+                            style="padding: 0.5rem 1rem; font-size: 0.75rem; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main);">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button onclick="downloadGateHistoryPDF()" class="btn-primary"
+                            style="padding: 0.5rem 1rem; font-size: 0.75rem; background: var(--primary);">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button onclick="clearGateHistory()" class="btn-primary"
+                            style="padding: 0.5rem 1rem; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); color: var(--error); box-shadow: none;">
+                            <i class="fas fa-trash"></i> PURGE
+                        </button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Details</th>
+                            <th>Department</th>
+                            <th>Year / Semester</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gate-history-table">
+                        <!-- History injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 15, qrbox: { width: 280, height: 280 } };
+
+        let isProcessingScan = false;
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            if (isProcessingScan) return;
+
+            try {
+                isProcessingScan = true;
+                const parts = decodedText.trim().split('|');
+                let data = {};
+
+                if (parts.length >= 7) {
+                    data = {
+                        id: parts[1].trim(),
+                        name: parts[2].trim(),
+                        dept: parts[3].trim(),
+                        year_sem_sec: parts[4].trim(),
+                        type: parts[5].trim(),
+                        expiry: parts[6].trim()
+                    };
+                } else if (parts.length === 6) {
+                    data = {
+                        id: parts[1].trim(),
+                        name: parts[2].trim(),
+                        dept: parts[3].trim(),
+                        year_sem_sec: 'N/A',
+                        type: parts[4].trim(),
+                        expiry: parts[5].trim()
+                    };
+                } else {
+                    throw new Error("Invalid format");
+                }
+
+                data.outing_time = new Date().toLocaleString();
+                const result = await recordGateEntry(data);
+
+                if (result.success) {
+                    showScanResult(result.record || data);
+                    await renderGateHistory();
+                    html5QrCode.pause();
+                    setTimeout(() => {
+                        document.getElementById('scan-result').style.display = 'none';
+                        html5QrCode.resume();
+                        isProcessingScan = false;
+                    }, 4000);
+                } else {
+                    alert("Verification Failed: " + (result.message || "Entryway violation"));
+                    isProcessingScan = false;
+                }
+            } catch (e) {
+                alert("Corrupted QR Data: " + e.message);
+                isProcessingScan = false;
+            }
+        }
+
+        function onScanFailure(error) { /* Background noise */ }
+
+        async function initGate() {
+            checkAuth('gate');
+            updateThemeToggleUI();
+            await renderGateHistory();
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
+        }
+
+        function showScanResult(record) {
+            const preview = document.getElementById('student-details-preview');
+            const container = document.getElementById('scan-result');
+
+            preview.innerHTML = `
+                <div style="display:flex; gap:1.25rem; align-items:center">
+                    ${record.photo ? `<img src="${record.photo}" style="width: 80px; height: 80px; border-radius: 1rem; object-fit: cover; border: 2.5px solid var(--success);">` : `<div style="width: 80px; height: 80px; border-radius: 1rem; background: var(--bg-input); display:flex; align-items:center; justify-content:center; border: 2.5px solid var(--glass-border);"><i class="fas fa-user-graduate" style="color:var(--text-muted); font-size:2rem;"></i></div>`}
+                    <div style="flex:1">
+                        <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">${record.name}</div>
+                        <div style="color: var(--primary-light); font-weight: 700; font-size: 0.875rem; margin-top: 0.25rem;">${record.dept} | ${record.year_sem_sec}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;"><i class="fas fa-clock"></i> Recorded at: ${record.outing_time}</div>
+                    </div>
+                </div>
+            `;
+            container.style.display = 'block';
+        }
+
+        async function renderGateHistory() {
+            const history = await getGateHistory();
+            const tableBody = document.getElementById('gate-history-table');
+
+            if (!Array.isArray(history) || history.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 3rem; color: var(--text-muted)">No exit records found in system.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = history.map(row => `
+                <tr>
+                    <td>
+                        <div style="font-weight: 700; color: var(--text-main);">${row.name}</div>
+                    </td>
+                    <td><span style="font-weight: 500;">${row.dept}</span></td>
+                    <td><span style="color: var(--text-muted);">${row.year_sem_sec}</span></td>
+                    <td><span style="color: var(--primary-light); font-weight: 600;">${row.outing_time}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

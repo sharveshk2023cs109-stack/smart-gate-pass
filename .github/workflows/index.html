@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Smart Gate Pass</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body onload="checkAuth(); initTheme()" class="auth-bg">
+    <div class="mesh-bg"></div>
+
+    <button onclick="toggleTheme()" class="theme-toggle"
+        style="position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-base); z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+        <i id="theme-toggle-icon" class="fas fa-sun"></i>
+    </button>
+
+    <main class="container animate-fade-in"
+        style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem;">
+        <div class="glass-card" style="max-width: 450px; width: 100%; padding: 2.5rem; position: relative;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: var(--primary); border-radius: 12px; margin-bottom: 1.25rem; box-shadow: 0 4px 6px -1px var(--primary-glow);">
+                    <i class="fas fa-shield-alt" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <h1
+                    style="font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; text-align: center; color: var(--text-main); background: none; -webkit-text-fill-color: initial;">
+                    Smart Gate Pass</h1>
+                <p
+                    style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600;">
+                    Kongunadu Engineering College</p>
+            </div>
+
+            <div
+                style="display: flex; gap: 0.25rem; background: var(--bg-dark); padding: 0.25rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+                <button onclick="switchLoginTab('portal')" class="tab-btn active" data-portal="portal"
+                    style="flex: 1; padding: 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">PORTAL</button>
+                <button onclick="switchLoginTab('gate')" class="tab-btn" data-portal="gate"
+                    style="flex: 1; padding: 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">SECURITY</button>
+                <button onclick="switchLoginTab('admin')" class="tab-btn" data-portal="admin"
+                    style="flex: 1; padding: 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">ADMIN</button>
+            </div>
+
+            <form onsubmit="handleLogin(event)" style="position: relative; z-index: 1;">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="input-style" placeholder="name@college.edu" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="input-style" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; justify-content: center; padding: 1rem; margin-top: 0.5rem; font-size: 1rem;">
+                    Sign In to Portal <i class="fas fa-arrow-right" style="font-size: 0.875rem;"></i>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; font-size: 0.875rem; color: var(--text-muted);">
+                Don't have an account? <a href="register.html"
+                    style="color: var(--primary); text-decoration: none; font-weight: 700; transition: var(--transition-smooth);">Create
+                    Account</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>

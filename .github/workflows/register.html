@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Smart Gate Pass</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body onload="initTheme()" class="auth-bg">
+    <div class="mesh-bg"></div>
+
+    <button onclick="toggleTheme()" class="theme-toggle"
+        style="position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-base); z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+        <i id="theme-toggle-icon" class="fas fa-sun"></i>
+    </button>
+
+    <main class="container animate-fade-in"
+        style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 1rem;">
+        <div class="glass-card" style="max-width: 500px; width: 100%; padding: 2rem; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <a href="index.html"
+                    style="color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.75rem; transition: var(--transition-base);">
+                    <i class="fas fa-arrow-left"></i> BACK
+                </a>
+                <h2 style="font-weight: 700; font-size: 1.25rem; color: var(--text-main); margin: 0;">Create Account
+                </h2>
+            </div>
+
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="input-style" placeholder="SARVESH" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" class="input-style" placeholder="sarvesh@gmail.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" class="input-style" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Account Role</label>
+                    <select name="role" id="role-select" class="input-style" required onchange="toggleFields()">
+                        <option value="student">Student</option>
+                        <option value="staff">Staff (Class Advisor)</option>
+                        <option value="warden">Warden</option>
+                        <option value="hod">HOD</option>
+                    </select>
+                </div>
+
+                <div id="photo-group" class="input-group">
+                    <label>Student Photo <span
+                            style="font-weight: normal; font-size: 0.75rem; color: var(--text-muted);">(Verification
+                            required)</span></label>
+                    <input type="file" name="user_photo" accept="image/*" id="photo-input" class="input-style"
+                        style="padding: 0.6rem; border-style: dashed;">
+                </div>
+
+                <div id="parent-mobile-group" class="input-group">
+                    <label>Parent Mobile Number</label>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <span
+                            style="background: var(--bg-input); border: 1px solid var(--glass-border); padding: 0.875rem; border-radius: 0.75rem; color: var(--text-muted); font-weight: 700; font-size: 0.875rem;">+91</span>
+                        <input type="tel" name="parent_mobile" class="input-style" placeholder="9876543210"
+                            pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                </div>
+
+                <!-- Role Specific Fields -->
+                <div id="extra-fields" style="display: none;">
+                    <div class="input-group" id="dept-group">
+                        <label>Department</label>
+                        <select name="dept" id="dept-select" class="input-style">
+                            <option value="CSE">CSE</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="AD">AD</option>
+                            <option value="BME">BME</option>
+                            <option value="IT">IT</option>
+                            <option value="AGRI">AGRI</option>
+                            <option value="MECH">MECH</option>
+                            <option value="CIVIL">CIVIL</option>
+                        </select>
+                    </div>
+
+                    <div id="year-sem-sec-wrap"
+                        style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                        <div class="input-group" id="year-group">
+                            <label id="year-label">Year</label>
+                            <select name="year" id="year-select" class="input-style" onchange="updateSemesters()">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="input-group" id="sem-group">
+                            <label>Semester</label>
+                            <select name="semester" id="semester-select" class="input-style"></select>
+                        </div>
+                        <div class="input-group" id="sec-group">
+                            <label>Section</label>
+                            <select name="section" class="input-style">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; justify-content: center; padding: 1.125rem; margin-top: 1.5rem; font-size: 1.1rem;">
+                    Complete Registration <i class="fas fa-user-plus"
+                        style="font-size: 0.9rem; margin-left: 0.5rem;"></i>
+                </button>
+            </form>
+
+            <div
+                style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+                Already have an account? <a href="index.html"
+                    style="color: var(--primary); text-decoration: none; font-weight: 700;">Sign In Instead</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        function updateSemesters() {
+            const year = document.getElementById('year-select').value;
+            const semesterSelect = document.getElementById('semester-select');
+            if (!semesterSelect) return;
+            semesterSelect.innerHTML = '';
+
+            let semesters = [];
+            if (year === '1') semesters = [1, 2];
+            else if (year === '2') semesters = [3, 4];
+            else if (year === '3') semesters = [5, 6];
+            else if (year === '4') semesters = [7, 8];
+
+            semesters.forEach(sem => {
+                const opt = document.createElement('option');
+                opt.value = sem;
+                opt.innerText = sem;
+                semesterSelect.appendChild(opt);
+            });
+        }
+
+        function toggleFields() {
+            const role = document.getElementById('role-select').value;
+            const extraFields = document.getElementById('extra-fields');
+            const deptGroup = document.getElementById('dept-group');
+            const yearGroup = document.getElementById('year-group');
+            const semGroup = document.getElementById('sem-group');
+            const secGroup = document.getElementById('sec-group');
+            const yearLabel = document.getElementById('year-label');
+            const photoGroup = document.getElementById('photo-group');
+            const parentMobileGroup = document.getElementById('parent-mobile-group');
+            const yearSemSecWrap = document.getElementById('year-sem-sec-wrap');
+
+            // Reset displays
+            photoGroup.style.display = (role === 'student') ? 'block' : 'none';
+            parentMobileGroup.style.display = (role === 'student') ? 'block' : 'none';
+
+            if (role === 'student') {
+                extraFields.style.display = 'block';
+                deptGroup.style.display = 'block';
+                yearSemSecWrap.style.display = 'grid';
+                yearGroup.style.display = 'block';
+                semGroup.style.display = 'block';
+                secGroup.style.display = 'block';
+                yearLabel.innerText = 'Year';
+                updateSemesters();
+            } else if (role === 'staff') {
+                extraFields.style.display = 'block';
+                deptGroup.style.display = 'block';
+                yearSemSecWrap.style.display = 'grid';
+                yearGroup.style.display = 'block';
+                semGroup.style.display = 'none';
+                secGroup.style.display = 'block';
+                yearLabel.innerText = 'Year';
+            } else if (role === 'warden') {
+                extraFields.style.display = 'block';
+                deptGroup.style.display = 'none';
+                yearSemSecWrap.style.display = 'grid';
+                yearGroup.style.display = 'block';
+                semGroup.style.display = 'none';
+                secGroup.style.display = 'none';
+                yearLabel.innerText = 'Year';
+            } else if (role === 'hod') {
+                extraFields.style.display = 'block';
+                deptGroup.style.display = 'block';
+                yearSemSecWrap.style.display = 'none';
+            } else {
+                extraFields.style.display = 'none';
+            }
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', toggleFields);
+    </script>
+</body>
+</body>
+
+</html>

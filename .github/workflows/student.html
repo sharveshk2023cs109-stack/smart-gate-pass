@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Leave/OD | Student</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body onload="initStudent()" class="dashboard-layout">
+    <div class="mesh-bg"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-user-graduate"></i>
+                <span>Student Portal</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" onclick="scrollToSection('apply-section')">
+                <i class="fas fa-paper-plane"></i> <span>Apply Pass</span>
+            </a>
+            <a href="#" class="sidebar-link" onclick="scrollToSection('history-section')">
+                <i class="fas fa-history"></i> <span>Pass History</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-primary"
+                style="width: 100%; height: auto; padding: 0.75rem; background: var(--secondary)">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="page-title">
+                <h1>Digital Gate Pass</h1>
+                <p>Submit and track your institutional leave/OD permissions.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button onclick="toggleTheme()" class="theme-toggle"
+                    style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-main); width: 40px; height: 40px; border-radius: 10px; cursor: pointer;">
+                    <i id="theme-toggle-icon" class="fas fa-sun"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid animate-fade-in">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Leaves Approved</h3>
+                    <p id="leave-count">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>ODs Approved</h3>
+                    <p id="od-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <section id="apply-section" class="animate-fade-in">
+            <div class="glass-card" style="padding: 2.5rem; max-width: 800px;">
+                <h2
+                    style="color: var(--primary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-pen-fancy"></i> New Permission Request
+                </h2>
+                <form id="student-form" onsubmit="handleStudentSubmit(event)">
+                    <div class="input-group">
+                        <label>Student Name</label>
+                        <input type="text" id="student-name" name="name" class="input-style" readonly>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="input-group">
+                            <label>Department</label>
+                            <input type="text" id="student-dept" name="dept" class="input-style" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Designation Details</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <input type="text" id="student-year" name="year" class="input-style" readonly>
+                                <input type="text" id="student-section" name="section" class="input-style" readonly>
+                            </div>
+                            <input type="hidden" id="student-semester" name="semester">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="input-group">
+                            <label>From Date</label>
+                            <input type="date" name="from_date" id="from-date" class="input-style" required
+                                onchange="calculateDays()">
+                        </div>
+                        <div class="input-group">
+                            <label>To Date</label>
+                            <input type="date" name="to_date" id="to-date" class="input-style" required
+                                onchange="calculateDays()">
+                        </div>
+                    </div>
+
+                    <div id="days-display"
+                        style="background: var(--primary-glow); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--glass-border); text-align: center; margin-bottom: 1.5rem; display: none;">
+                        <span style="font-weight: 700; color: var(--primary-light);">Total Calculated Duration: <span
+                                id="calculated-days">0</span> Day(s)</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="input-group">
+                            <label>Request Type</label>
+                            <select name="type" class="input-style" required>
+                                <option value="Leave">Personal Leave</option>
+                                <option value="On Duty">Institutional On Duty (OD)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Residency Category</label>
+                            <select name="resident_type" class="input-style" required>
+                                <option value="Day Scholar">Day Scholar</option>
+                                <option value="Hosteller">Hosteller</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Reason for Request</label>
+                        <textarea name="reason" rows="3" class="input-style" style="height: auto; min-height: 100px;"
+                            placeholder="Provide specific reason for your application..." required></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Supporting Evidence (Optional)</label>
+                        <div style="position: relative;">
+                            <input type="file" name="document" accept="image/*" class="input-style"
+                                style="padding: 0.75rem; cursor: pointer; border-style: dashed;">
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;"><i
+                                    class="fas fa-info-circle"></i> Attach medical certificates or event invitations if
+                                applicable.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary"
+                        style="width: 100%; justify-content: center; padding: 1.25rem; font-size: 1.1rem; margin-top: 1rem;">
+                        Submit Application <i class="fas fa-paper-plane"
+                            style="margin-left: 0.5rem; font-size: 0.9rem;"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="history-section" class="animate-fade-in" style="margin-top: 4rem;">
+            <div id="student-requests-container">
+                <!-- Personalized requests rendered here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        async function initStudent() {
+            checkAuth('student');
+            updateThemeToggleUI();
+            const requests = await getRequests();
+            await autoFillStudentDetails(requests);
+            await renderStudentRequests(requests);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function calculateDays() {
+            const from = document.getElementById('from-date').value;
+            const to = document.getElementById('to-date').value;
+            const display = document.getElementById('days-display');
+            const span = document.getElementById('calculated-days');
+
+            if (from && to) {
+                const startDate = new Date(from);
+                const endDate = new Date(to);
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                if (endDate >= startDate) {
+                    display.style.display = 'block';
+                    span.innerText = diffDays;
+                } else {
+                    display.style.display = 'none';
+                }
+            } else {
+                display.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+<script src="script.js"></script>
+<script>
+    async function initStudent() {
+        checkAuth('student');
+        renderAuthNav();
+
+        // Optimization: Fetch requests once and distribute to components
+        const requests = await getRequests();
+        await autoFillStudentDetails(requests);
+        await renderStudentRequests(requests);
+    }
+</script>
+</body>
+
+</html>
