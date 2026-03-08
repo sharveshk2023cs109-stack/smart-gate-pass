@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard | Smart Gate Pass</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body onload="initStaff()" class="dashboard-layout">
+    <div class="mesh-bg"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Advisor Portal</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" onclick="switchPortalTab('pending', 'staff')">
+                <i class="fas fa-tasks"></i> <span>Incoming Requests</span>
+            </a>
+            <a href="#" class="sidebar-link" onclick="switchPortalTab('history', 'staff')">
+                <i class="fas fa-history"></i> <span>Approval History</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-primary"
+                style="width: 100%; height: auto; padding: 0.75rem; background: var(--secondary)">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="page-title">
+                <h1>Advisor Dashboard</h1>
+                <p id="staff-info">Loading advisor context...</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button onclick="toggleTheme()" class="theme-toggle"
+                    style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-main); width: 40px; height: 40px; border-radius: 10px; cursor: pointer;">
+                    <i id="theme-toggle-icon" class="fas fa-sun"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Requests Grid -->
+        <div id="requests-container" class="animate-fade-in"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem;">
+            <!-- Requests will be rendered here via JS -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        async function initStaff() {
+            checkAuth('staff');
+            updateThemeToggleUI();
+            await renderRequests('staff');
+        }
+    </script>
+</body>
+
+</html>
